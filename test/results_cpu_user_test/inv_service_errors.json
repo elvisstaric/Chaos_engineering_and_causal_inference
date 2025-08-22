@@ -1,0 +1,1 @@
+{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"endpoint":"/products/quantity","http_status_class":"4xx","method":"PUT"},"values":[[1754298203,"0"],[1754298233,"0"],[1754298263,"0"],[1754298293,"0"],[1754298323,"0"],[1754298353,"0"],[1754298383,"0"],[1754298413,"0"]]}]}}

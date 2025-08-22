@@ -1,0 +1,110 @@
+version: "3.8"
+
+services:
+  user_service:
+    build:
+      context: ./user_service
+    ports:
+      - "8000:8000"
+    networks:
+      - chaos_net
+
+  inventory_service:
+    build:
+      context: ./inventory_service
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./inventory_service/inventory.csv:/app/inventory.csv
+    networks:
+      - chaos_net
+
+  cart_service:
+    build:
+      context: ./cart_service
+    ports:
+      - "8002:8002"
+    networks:
+      - chaos_net
+
+  order_service:
+    build:
+      context: ./order_service
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./order_service/orders.json:/app/orders.json
+    networks:
+      - chaos_net
+
+  # Stress testing service
+  stress_ng:
+    image: ubuntu:22.04
+    command: >
+      bash -c "
+        apt-get update && apt-get install -y stress-ng &&
+        echo 'Stress-ng installed. Use docker exec to run stress tests.' &&
+        tail -f /dev/null
+      "
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - chaos_net
+    privileged: true
+
+  locust:
+    build:
+      context: ./locust
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./locust:/mnt/locust
+    working_dir: /mnt/locust
+    command: -f locustfile.py --host=http://localhost
+    depends_on:
+      - user_service
+      - inventory_service
+      - cart_service
+      - order_service
+    networks:
+      - chaos_net
+  toxiproxy:
+    image: shopify/toxiproxy
+    ports:
+      - "8474:8474"
+      - "8600:8600"
+      - "8601:8601"
+      - "8602:8602"
+      - "8603:8603"
+    networks:
+      - chaos_net
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - chaos_net
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - chaos_net
+    depends_on:
+      - prometheus
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - chaos_net
+
+networks:
+  chaos_net:
+    driver: bridge
