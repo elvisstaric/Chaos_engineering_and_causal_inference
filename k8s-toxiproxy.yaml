@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: toxiproxy
+  labels:
+    app: toxiproxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: toxiproxy
+  template:
+    metadata:
+      labels:
+        app: toxiproxy
+    spec:
+      containers:
+        - name: toxiproxy
+          image: shopify/toxiproxy:latest
+          ports:
+            - containerPort: 8474
+            - containerPort: 8600
+            - containerPort: 8601
+            - containerPort: 8602
+            - containerPort: 8603
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: toxiproxy
+  labels:
+    app: toxiproxy
+spec:
+  selector:
+    app: toxiproxy
+  ports:
+    - name: api
+      port: 8474
+      targetPort: 8474
+      protocol: TCP
+    - name: user-proxy
+      port: 8600
+      targetPort: 8600
+      protocol: TCP
+    - name: inventory-proxy
+      port: 8601
+      targetPort: 8601
+      protocol: TCP
+    - name: cart-proxy
+      port: 8602
+      targetPort: 8602
+      protocol: TCP
+    - name: order-proxy
+      port: 8603
+      targetPort: 8603
+      protocol: TCP
+  type: ClusterIP
