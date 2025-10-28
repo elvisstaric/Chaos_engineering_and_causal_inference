@@ -3,8 +3,8 @@ graph LR
 subgraph "Chaos Experiments (20 Total)"
 HT[High Traffic<br/>3 experiments]
 LI[Latency Injection<br/>4 experiments]
-TS[Timeout Simulation<br/>4 experiments]
-RS[Resource Stress<br/>12 experiments]
+BW[Bandwidth Simulation<br/>3 experiments]
+RS[Resource Stress<br/>10 experiments]
 end
 
     %% Metrics Collected
@@ -22,10 +22,10 @@ end
 
     %% Model Examples
     subgraph "Example Models"
-        M1[Model 1: High Traffic → User Requests<br/>ATE = 164.46]
-        M2[Model 2: High Traffic → Cart Latency<br/>ATE = -0.009]
-        M3[Model 3: User Latency → Cart Requests<br/>ATE = -26.88]
-        M4[Model 16: High Traffic → User → Cart → Order → Inventory<br/>ATE = 38.82]
+        M1[Model 1: High Traffic → User Requests<br/>ATE = 161.27]
+        M2[Model 2: High Traffic → Cart Latency<br/>ATE = 17.62]
+        M3[Model 7: Cart Latency → Cart Requests<br/>ATE = -46.18]
+        M4[Model 17: High Traffic → Cart → Inventory → Order Errors<br/>ATE = 110.06]
     end
 
     %% Analysis Process
@@ -46,8 +46,8 @@ end
     %% Connections
     HT --> REQ
     LI --> LAT
-    TS --> ERR
-    RS --> REQ
+    BW --> LAT
+    RS --> LAT
 
     REQ --> DIRECT
     LAT --> DIRECT
@@ -83,7 +83,7 @@ end
     classDef process fill:#fce4ec,stroke:#c2185b,stroke-width:2px
     classDef result fill:#e0f2f1,stroke:#00695c,stroke-width:2px
 
-    class HT,LI,TS,RS experiment
+    class HT,LI,BW,RS experiment
     class REQ,LAT,ERR metric
     class DIRECT,MEDIATED model
     class M1,M2,M3,M4 example
