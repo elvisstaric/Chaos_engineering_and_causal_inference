@@ -1,0 +1,1 @@
+{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"endpoint":"/orders","http_status_class":"4xx","method":"POST"},"values":[[1761129840,"50.395968322534195"],[1761129870,"19.7376"],[1761129900,"23.79746732435275"],[1761130140,"9.133279483037157"]]},{"metric":{"endpoint":"/orders","http_status_class":"5xx","method":"POST"},"values":[[1761130140,"0"]]}]}}
